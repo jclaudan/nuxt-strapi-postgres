@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  nuxtjs:
+    container_name: nuxt
+    depends_on:
+      - strapidev
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn dev
+    ports:
+      - "3000:3000"
+      - "9229:9229" # for debugging
+    expose:
+      - "3000"
+    restart: always
+    environment:
+      HOST: 0.0.0.0
+      NODE_ENV: development
+  
+  strapidev:
+    image: strapi/strapi:3.6.5-alpine
+    container_name: strapidev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    networks:
+      - strapi-app-network
+    volumes:
+      - ./strapi:/srv/app
+    ports:
+      - "1337:1337"
+    depends_on:
+      - db
+  
+  db:
+    container_name: postgres
+    image: postgres:13.3-alpine
+    restart: always
+    env_file: .env
+    networks:
+      - strapi-app-network
+    volumes:
+      # - ./db:/var/lib/postgresql/data
+      # - /tmp:/tmp
+      # - strapidata:/data/db
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/data.sql
+      - pgdata:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+  
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment: 
+        PGADMIN_DEFAULT_EMAIL: "admin@gov.ky"
+        PGADMIN_DEFAULT_PASSWORD: "test123!"
+    ports: 
+        - "16543:80"
+    depends_on: 
+        - db
+
+networks:
+  strapi-app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
