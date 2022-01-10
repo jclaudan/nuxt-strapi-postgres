@@ -1,20 +1,17 @@
-# Dockerfile
-FROM node:14.17.1-alpine3.12 as base
+ARG BASE_VERSION
+FROM strapi/base:${BASE_VERSION}
 
-WORKDIR /usr/src/app
+ARG STRAPI_VERSION
+RUN yarn global add @strapi/strapi@${STRAPI_VERSION}
 
-COPY package*.json ./
-COPY yarn.lock ./
-EXPOSE 3000
+RUN mkdir /srv/app && chown 1000:1000 -R /srv/app
 
-FROM base as production
-ENV NODE_ENV=production
-RUN yarn install --frozen-lockfile --ignore-engines
-COPY . .
-CMD [ "yarn", "start" ]
+WORKDIR /srv/app
 
-FROM base as dev
-ENV NODE_ENV=development
-RUN yarn install --ignore-engines
-COPY . .
-CMD [ "yarn", "dev" ]
+VOLUME /srv/app
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh 
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["strapi", "develop"]

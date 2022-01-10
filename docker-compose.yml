@@ -1,31 +1,14 @@
-version: '3.8'
+version: "3.8"
+
 services:
-  nuxtjs:
-    container_name: nuxt
-    depends_on:
-      - strapidev
-    stdin_open: true
-    tty: true
-    build:
+  strapi:
+    # image: strapi/strapi
+    build: 
       context: .
-      target: dev
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: yarn dev
-    ports:
-      - "3000:3000"
-      - "9229:9229" # for debugging
-    expose:
-      - "3000"
-    restart: always
-    environment:
-      HOST: 0.0.0.0
-      NODE_ENV: development
-  
-  strapidev:
-    image: strapi/strapi:3.6.5-alpine
-    container_name: strapidev
+      args:
+        BASE_VERSION: latest
+        STRAPI_VERSION: 4.0.2
+    container_name: strapi
     restart: unless-stopped
     env_file: .env
     environment:
@@ -35,15 +18,16 @@ services:
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
     networks:
       - strapi-app-network
     volumes:
-      - ./strapi:/srv/app
+      - ./app:/srv/app
     ports:
       - "1337:1337"
     depends_on:
       - db
-  
+
   db:
     container_name: postgres
     image: postgres:13.3-alpine
