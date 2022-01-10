@@ -53,8 +53,8 @@ services:
   pgadmin-compose:
     image: dpage/pgadmin4
     environment: 
-        PGADMIN_DEFAULT_EMAIL: "admin@gov.ky"
-        PGADMIN_DEFAULT_PASSWORD: "test123!"
+        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports: 
         - "16543:80"
     depends_on: 
