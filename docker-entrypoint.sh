@@ -40,6 +40,16 @@ if [ "$1" = "strapi" ]; then
 
 fi
 
+if [ -d "/srv/config-dumps-files" ]; then
+
+  strapi configuration:restore -f /srv/config-dumps-files/$DUMP_VERSION-dump-file.json
+
+else
+
+  mkdir /srv/config-dumps-files
+
+fi
+
 echo "Starting your app..."
 
 exec "$@"
