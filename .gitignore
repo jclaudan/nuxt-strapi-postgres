@@ -89,7 +89,14 @@ sw.*
 # Vim swap files
 *.swp
 
-
+# Docker Volume directorys
 db
 sql
 app
+data
+pgdata
+letsencrypt
+
+mkcert/certs
+webserver/nginx/certs
+robot_test

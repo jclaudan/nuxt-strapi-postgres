@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "order",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "state": {
+      "type": "json"
+    },
+    "amount": {
+      "type": "float"
+    },
+    "invoice": {
+      "type": "json"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "zipcode": {
+      "type": "string"
+    },
+    "country": {
+      "type": "enumeration",
+      "enum": [
+        "france",
+        "england"
+      ]
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
+    }
+  }
+}

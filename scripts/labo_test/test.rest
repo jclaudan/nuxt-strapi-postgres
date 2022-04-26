@@ -1,0 +1,59 @@
+@remote-server = http://localhost:1337
+# @name login
+POST {{remote-server}}/admin/login
+content-type: application/json
+
+{
+    "email":"admin@admin.com",
+    "password":""
+}
+
+###
+POST {{remote-server}}/api/auth/local
+content-type: application/json
+
+{
+    "identifier":"qwerty@qwerty.qw",
+    "password":"qwerty"
+}
+
+
+###
+@accessToken = Bearer {{login.response.body.token}}
+#
+POST {{remote-server}}/strapi-v4-plugin-entreprenerd-stripe/pay
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MzM0NDE3LCJleHAiOjE2NDg5MjY0MTd9.xuDPWWa4NUZ-rWFjOG9GhR8KOgOgB7EPKZ_BuOZyJfY
+
+{
+  "amount": "10"
+}
+###
+POST {{remote-server}}/strapi-v4-plugin-entreprenerd-stripe/pay
+content-type: application/json
+
+###
+GET {{remote-server}}/api/products
+content-type: application/json
+
+###
+POST {{remote-server}}/api/carts
+content-type: application/json
+
+{
+  "data": {
+    "content": "string"
+  }
+}
+
+###
+GET http://192.168.208.2:4000/init?category=2&locations=d_94&fuel=1%2C2%2C6%2C4&vehicle_type=4x4%2Cberline%2Ccabriolet%2Ccitadine&regdate=2015-2020&price=40000-50000
+
+###
+POST https://dev.newgate-it.fr/strapi-v4-plugin-entreprenerd-stripe/webhook
+
+{
+  "data": {
+    "content": "rara"
+  }
+}

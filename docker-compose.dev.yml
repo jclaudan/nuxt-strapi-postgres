@@ -1,0 +1,110 @@
+version: "3.8"
+
+services:
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - strapi-app-network
+
+
+  strapi:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+      args:
+        BASE_VERSION: latest
+        STRAPI_VERSION: 4.1.8
+    container_name: strapi
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT_DEV}
+      DATABASE_NAME: ${DATABASE_NAME_DEV}
+      DATABASE_HOST: ${DATABASE_HOST_DEV}
+      DATABASE_PORT: ${DATABASE_PORT_DEV}
+      DATABASE_USERNAME: ${DATABASE_USERNAME_DEV}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD_DEV}
+      NODE_ENV: ${NODE_ENV_DEV}
+      DUMP_VERSION: ${DUMP_VERSION_DEV}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET_DEV}
+      API_TOKEN_SALT: ${API_TOKEN_SALT_DEV}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY_DEV}
+      WEBHOOK_STRIPE_TOKEN: ${WEBHOOK_STRIPE_TOKEN_DEV}
+      SERVER_URL: ${SERVER_URL_DEV}
+      ADMIN_DASHBOARD_URL: ${ADMIN_DASHBOARD_URL_DEV}
+      HOST: ${HOST_DEV}
+      PORT: ${PORT_DEV}
+    networks:
+      - strapi-app-network
+    volumes:
+      - ./app:/srv/app
+      - ./config-dumps-files:/srv/config-dumps-files
+    ports:
+      - "1337:1337"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./vue-cart
+      dockerfile: Dockerfile-frontend
+    container_name: frontend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      VITE_BASE_URL: ${VITE_BASE_URL_DEV}
+    networks:
+      - strapi-app-network
+    # volumes:
+    #   - ./vue-cart/dist:/usr/share/nginx/html
+    ports:
+      - "8080:8080"
+    depends_on:
+      - strapi
+
+  db:
+    container_name: postgres
+    image: postgres:13.3-alpine
+    restart: always
+    env_file: .env
+    networks:
+      - strapi-app-network
+    volumes:
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/data.sql
+      - ./pgdata:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME_DEV}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD_DEV}
+      POSTGRES_DB: ${DATABASE_NAME_DEV}
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL_DEV}
+        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD_DEV}
+    networks:
+      - strapi-app-network
+    ports:
+        - "16543:80"
+    depends_on:
+        - db
+networks:
+  strapi-app-network:
+    driver: bridge
+volumes:
+  pgdata:
+  pgadmin:
+  ssl_data:

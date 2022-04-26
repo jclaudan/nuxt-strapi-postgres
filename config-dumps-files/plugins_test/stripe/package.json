@@ -1,0 +1,28 @@
+{
+  "name": "stripe",
+  "version": "0.0.0",
+  "description": "This is the description of the plugin.",
+  "strapi": {
+    "name": "stripe",
+    "description": "Description of stripe plugin",
+    "kind": "plugin"
+  },
+  "dependencies": {
+    "@buffetjs/core": "^3.2.1",
+    "stripe": "^8.82.0",
+    "styled-components": "^5.1.1"
+  },
+  "author": {
+    "name": "A Strapi developer"
+  },
+  "maintainers": [
+    {
+      "name": "A Strapi developer"
+    }
+  ],
+  "engines": {
+    "node": ">=12.x. <=16.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
